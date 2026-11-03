@@ -1,0 +1,19 @@
+#!/bin/bash
+while true
+do
+   # Membuat aktivitas CPU ringan selama 2-3 detik
+   dd if=/dev/urandom of=/dev/null bs=1M count=20 > /dev/null 2>&1
+   # Membuat aktivitas jaringan ringan (ping ke Google)
+   ping -c 4 8.8.8.8 > /dev/null 2>&1
+   # Istirahat selama 5 menit (300 detik) lalu ulangi lagi
+   sleep 300
+done
+
+
+
+nano keep-alive.sh
+
+chmod +x keep-alive.sh
+
+
+nohup ./keep-alive.sh > /dev/null 2>&1 &
