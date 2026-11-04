@@ -1,0 +1,65 @@
+Baca seluruh instruksi ProjectChika.md, tetapi gunakan identitas dan nama final berikut:
+
+CHIKAMD — UNIFIED MULTI DEVICE BOT
+
+Nama proyek final: ChikaMD
+
+Nama bot: ChikaMD
+
+Nama aplikasi, package, dokumentasi, konfigurasi, dan identitas runtime harus menggunakan ChikaMD.
+
+Gabungkan ketiga source:
+
+1. Hoshino Ai
+2. Kaguya Multi Device V5
+3. vanXone V4
+
+ARSITEKTUR WAJIB
+
+- Hoshino menjadi fondasi utama.
+- Kaguya dan vanXone diintegrasikan ke dalam struktur Hoshino.
+- Gabungkan seluruh engine yang kompatibel.
+- Pertahankan fitur Telegram Kaguya sebagai fitur opsional.
+- Gabungkan handler, plugin, database, utility, dan sistem lainnya.
+- Gunakan satu runtime WhatsApp utama.
+- Gunakan satu plugin loader dan satu handler pipeline.
+- Gunakan satu konfigurasi utama bernama config.js.
+- Gunakan satu entry point bernama index.js.
+- Gunakan satu package.json.
+
+KEBERSIHAN SOURCE
+
+- Seluruh JavaScript wajib CommonJS.
+- Semua JavaScript menggunakan ekstensi .js.
+- Dilarang membuat .mjs, .cjs, .ts, atau .tsx.
+- Jangan membuat file duplikat, backup tidak perlu, atau file percobaan.
+- Jangan meninggalkan tiga source bot sebagai aplikasi terpisah.
+- Jangan membuat folder ProjectChika di dalam ChikaMD.
+- Pertahankan struktur yang rapi dan modular.
+
+IDENTITAS FINAL
+
+Gunakan:
+
+- Project name: ChikaMD
+- Bot name: ChikaMD
+- Package name: chikamd
+- Main entry: index.js
+- Main config: config.js
+
+Nama ProjectChika.md hanya menjadi dokumen instruksi dan bukan nama aplikasi final.
+
+EKSEKUSI
+
+Mulai dengan audit ketiga ZIP secara menyeluruh, kemudian lakukan integrasi, refactoring, pengujian, optimasi, dan dokumentasi.
+
+Kerjakan sampai 15.50 WIB sesuai deadline yang ditentukan.
+
+Jangan berhenti setelah membuat rencana. Simpan progres secara berkala dan laporkan pekerjaan yang belum selesai secara jujur.
+
+Target akhir:
+
+npm install
+node index.js
+
+Hasilnya harus satu bot Multi Device bernama ChikaMD, bukan tiga bot yang hanya diletakkan dalam satu folder.
