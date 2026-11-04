@@ -1,0 +1,63 @@
+# language: Python 3, file: antisleep.py, target: Ubuntu (X11)
+# Loop: ketik karakter acak → save /workspace/abc/a.txt → jeda 30 detik → ulang.
+# Stop: Ctrl+C, atau buat file /workspace/abc/stop.
+# Dependency (X11): sudo apt install xdotool
+#   Wayland: xdotool tidak jalan — lihat catatan di bawah.
+
+import os
+import sys
+import time
+import random
+import string
+import subprocess
+from pathlib import Path
+
+TARGET    = Path("/workspace/abc/a.txt")   # absolut — aman dari cwd mana pun
+STOP_FILE = Path("/workspace/abc/stop")
+DELAY     = 30
+CHARS     = string.ascii_letters + string.digits + " \n"
+HAS_XDOTOOL = subprocess.run(["which", "xdotool"], capture_output=True).returncode == 0
+
+
+def random_text(n=None):
+    n = n or random.randint(1, 20)
+    return "".join(random.choice(CHARS) for _ in range(n))
+
+
+def write_and_save():
+    TARGET.parent.mkdir(parents=True, exist_ok=True)
+    with TARGET.open("a", encoding="utf-8") as f:
+        f.write(random_text())
+        f.flush()
+        os.fsync(f.fileno())      # flush ke disk = save beneran
+    os.utime(TARGET, None)
+
+
+def poke_idle():
+    """Reset idle timer OS: tap shift lewat xdotool, tak ganggu app lain."""
+    if HAS_XDOTOOL:
+        subprocess.run(["xdotool", "key", "shift"], check=False)
+
+
+def stop_requested():
+    return STOP_FILE.exists()
+
+
+def main():
+    print(f"[antisleep] aktif. target={TARGET} stop={STOP_FILE} jeda={DELAY}s")
+    while not stop_requested():
+        write_and_save()
+        poke_idle()
+        print(f"[antisleep] {time.strftime('%H:%M:%S')} ketik+save, jeda {DELAY}s")
+        for _ in range(DELAY):
+            if stop_requested():
+                break
+            time.sleep(1)
+    print("[antisleep] stop. keluar.")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n[antisleep] Ctrl+C — keluar.")
