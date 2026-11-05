@@ -1,647 +1,204 @@
-CHIKALOCK ULTIMATE
-
-FULL SOURCE CODE DEVELOPMENT
-
-VERSION 1.0
-
-Buat sistem ChikaLock Ultimate secara FULL SOURCE CODE dengan 4 PROJECT TERPISAH yang saling terintegrasi.
-
-Jangan hanya membuat struktur folder. Implementasikan seluruh fitur, buat kode yang berfungsi, lakukan testing, dan perbaiki error.
-
-==================================================
-
-1. GLOBAL RULES
-
-==================================================
-
-ROOT DIRECTORY WAJIB:
-
-/workspace/abc/ChikaMD/ProjectBaru/
-
-Semua file, folder, konfigurasi, dan source code wajib berada di dalam direktori tersebut.
-
-Buat tepat 4 project:
-
-1. ChikaLock-Bot
-2. ChikaLock-Database
-3. ChikaLock-API
-4. ChikaLock-Package
-
-STRUKTUR ROOT:
-
-ProjectBaru/
-│
-├── ChikaLock-Bot/
-├── ChikaLock-Database/
-├── ChikaLock-API/
-└── ChikaLock-Package/
-
-ATURAN:
-
-- Jangan membuat project di luar ROOT DIRECTORY.
-- Jangan menggabungkan keempat project menjadi satu aplikasi.
-- Jangan mengubah atau menghapus file ChikaMD di luar ProjectBaru.
-- Setiap project harus independen.
-- Setiap project memiliki konfigurasi sendiri.
-- Gunakan JavaScript CommonJS.
-- Semua file JavaScript menggunakan ekstensi .js.
-- Dilarang menggunakan ESM atau .mjs.
-- Gunakan Node.js 20+.
-- Buat kode modular dan rapi.
-- Hindari file yang tidak diperlukan.
-- Jangan meninggalkan TODO untuk fitur inti.
-- Jangan membuat implementasi palsu.
-- Jangan mengklaim testing berhasil jika belum dijalankan.
-
-==================================================
-
-PROJECT 1: CHIKALOCK TELEGRAM OWNER BOT
-
-==================================================
-
-DIRECTORY:
-
-/workspace/abc/ChikaMD/ProjectBaru/ChikaLock-Bot/
-
-PLATFORM:
-
-- Node.js 20+
-- CommonJS
-- Telegram Bot API
-- Long Polling
-- GitHub Contents API
-
-FUNGSI UTAMA:
-
-Telegram Bot berfungsi sebagai panel administrasi untuk mengelola pengguna ChikaLock.
-
-COMMAND:
-
-/start
-/daftar USER, PASS, NOMOR
-/block NOMOR
-/unblock NOMOR
-/hapus NOMOR
-/list
-/blocked
-/cek NOMOR
-
-DETAIL FITUR:
-
-1. OWNER AUTHENTICATION
-
-- Hanya OWNER_ID yang boleh menggunakan command administratif.
-- Validasi Telegram numeric ID.
-- Pengguna lain tidak boleh mengakses database.
-- Tolak semua command administratif dari non-owner.
-
-2. REGISTRATION
-
-Format:
-
-/daftar Ranz, RanzRyuu, 628123456789
-
-Data:
-
-- USER
-- PASS
-- NOMOR
-
-Proses:
-
-- Validasi seluruh input.
-- Periksa duplikasi USER.
-- Periksa duplikasi NOMOR.
-- Hash password menggunakan Argon2id.
-- Generate ID_NUM secara random dan unik.
-- Simpan data ke REGISTERED.
-- Perbarui database GitHub.
-- Berikan hasil registrasi kepada owner.
-
-Password plaintext tidak boleh disimpan.
-
-3. BLOCK SYSTEM
-
-Format:
-
-/block 628123456789
-
-Proses:
-
-- Cari akun berdasarkan NOMOR.
-- Tambahkan nomor ke BLOCK.
-- Simpan alasan block jika diberikan.
-- Perbarui GitHub.
-- Kirim notifikasi kepada owner.
-
-4. UNBLOCK SYSTEM
-
-Format:
-
-/unblock 628123456789
-
-Proses:
-
-- Hapus nomor dari BLOCK.
-- Jangan menghapus data REGISTERED.
-- Perbarui GitHub.
-
-5. DELETE SYSTEM
-
-Format:
-
-/hapus 628123456789
-
-Proses:
-
-- Tampilkan konfirmasi sebelum menghapus.
-- Hapus akun dari REGISTERED.
-- Tangani BLOCK sesuai kebijakan penghapusan yang konsisten.
-- Perbarui GitHub.
-
-6. LIST SYSTEM
-
-/list:
-
-- Tampilkan akun terdaftar.
-- USER.
-- NOMOR.
-- ID_NUM.
-- Status akun.
-
-Jangan tampilkan PASS_HASH.
-
-7. BLOCKED LIST
-
-/blocked:
-
-- Tampilkan seluruh nomor yang diblokir.
-- Tampilkan alasan block jika tersedia.
-
-8. CHECK ACCOUNT
-
-/cek NOMOR:
-
-- Periksa status akun.
-- Tampilkan REGISTERED, BLOCKED, atau NOT_REGISTERED.
-
-9. GITHUB INTEGRATION
-
-Gunakan GitHub Contents API untuk:
-
-- Membaca database.
-- Memperbarui database.
-- Mengambil SHA terbaru.
-- Mengatasi HTTP 409 conflict.
-- Melakukan retry dengan membaca ulang database terbaru.
-- Menghindari overwrite perubahan terbaru.
-
-Jangan menggunakan GitHub Raw URL untuk menulis database.
-
-10. ENVIRONMENT
-
-Buat .env.example:
-
-BOT_TOKEN=
-OWNER_ID=
-GITHUB_TOKEN=
-GITHUB_OWNER=
-GITHUB_REPO=
-GITHUB_BRANCH=main
-GITHUB_DATABASE_PATH=database.json
-
-GITHUB_TOKEN hanya berada di Telegram Bot.
-
-Jangan pernah menampilkan token melalui log atau Telegram.
-
-11. PROJECT STRUCTURE
-
-ChikaLock-Bot/
-│
-├── index.js
-├── config.js
-├── package.json
-├── .env.example
-├── README.md
-└── src/
-├── telegram.js
-├── commands.js
-├── github.js
-├── database.js
-├── registration.js
-├── blocking.js
-└── security.js
-
-==================================================
-
-PROJECT 2: CHIKALOCK GITHUB DATABASE
-
-==================================================
-
-DIRECTORY:
-
-/workspace/abc/ChikaMD/ProjectBaru/ChikaLock-Database/
-
-FILE UTAMA:
-
-database.json
-
-FORMAT:
-
-{
-"REGISTERED": [],
-"BLOCK": []
-}
-
-REGISTERED STRUCTURE:
-
-{
-"USER": "Ranz",
-"PASS_HASH": "$argon2id$...",
-"NOMOR": "628123456789",
-"ID_NUM": "839201746"
-}
-
-BLOCK STRUCTURE:
-
-{
-"NOMOR": "628999999999",
-"REASON": "Owner Blocked"
-}
-
-DATABASE RULES:
-
-1. REGISTERED menyimpan pengguna yang terdaftar.
-2. BLOCK menyimpan nomor yang diblokir.
-3. NOMOR menjadi identitas utama pencarian.
-4. ID_NUM harus unik.
-5. PASS_HASH harus menggunakan Argon2id.
-6. Jangan menyimpan password plaintext.
-7. BLOCK memiliki prioritas tertinggi.
-8. Nomor yang tidak ditemukan dalam REGISTERED dianggap NOT_REGISTERED.
-9. Unblock tidak otomatis menghapus akun dari REGISTERED.
-10. Penghapusan akun harus menjaga konsistensi REGISTERED dan BLOCK.
-
-GITHUB HOSTING:
-
-Database akan dihosting melalui GitHub Repository.
-
-Contoh Raw URL:
-
-https://raw.githubusercontent.com/OWNER/REPOSITORY/BRANCH/database.json
-
-KETENTUAN:
-
-- Repository sebaiknya private.
-- Jika private, gunakan GitHub API dengan read-only credential untuk Vercel.
-- Telegram Bot menggunakan GitHub Contents API dengan izin tulis.
-- Vercel hanya memiliki izin baca.
-- Jangan menyimpan token GitHub di database.json.
-- Buat dokumentasi format database.
-
-Tidak perlu membuat aplikasi Node.js tersendiri untuk database.
-
-==================================================
-
-PROJECT 3: CHIKALOCK VERCEL LICENSE API
-
-==================================================
-
-DIRECTORY:
-
-/workspace/abc/ChikaMD/ProjectBaru/ChikaLock-API/
-
-PLATFORM:
-
-- Vercel Serverless Functions.
-- Node.js.
-- CommonJS.
-- JavaScript.
-
-ENDPOINT:
-
-GET /api/scriptlock/[nomor]
-
-CONTOH:
-
-https://DOMAIN.vercel.app/api/scriptlock/628123456789
-
-TUGAS:
-
-1. Menerima NOMOR dari URL.
-2. Mengambil database.json dari GitHub.
-3. Memeriksa BLOCK terlebih dahulu.
-4. Memeriksa REGISTERED.
-5. Mengembalikan status lisensi.
-6. Tidak mengubah database.
-7. Tidak membocorkan PASS_HASH.
-
-LOGIC:
-
-IF NOMOR EXISTS IN BLOCK:
-STATUS = BLOCKED
-
-ELSE IF NOMOR NOT EXISTS IN REGISTERED:
-STATUS = NOT_REGISTERED
-
-ELSE:
-STATUS = AUTHORIZED
-
-Jika database gagal diakses:
-STATUS = ERROR
-
-RESPONSE AUTHORIZED:
-
-{
-"status": "AUTHORIZED",
-"message": "Access Granted"
-}
-
-RESPONSE BLOCKED:
-
-{
-"status": "BLOCKED",
-"message": "YOUR HAS BLOCK"
-}
-
-RESPONSE NOT_REGISTERED:
-
-{
-"status": "NOT_REGISTERED",
-"message": "YOU ARE NOT REGISTERED"
-}
-
-RESPONSE ERROR:
-
-{
-"status": "ERROR",
-"message": "LICENSE SERVER ERROR"
-}
-
-SECURITY:
-
-1. Implementasikan Ed25519 signed response.
-2. Private signing key hanya berada di environment Vercel.
-3. Public key disediakan untuk NPM Package.
-4. GitHub credential hanya memiliki izin baca.
-5. Tambahkan timeout request.
-6. Validasi format NOMOR.
-7. Jangan membocorkan PASS_HASH.
-8. Fail closed jika database tidak tersedia.
-9. Fail closed jika signature tidak valid.
-10. Tambahkan timestamp dan expiry pada signed response.
-11. Gunakan nonce atau request identifier untuk mengurangi risiko replay.
-12. Jangan menggunakan in-memory rate limiting sebagai proteksi global.
-13. Jangan memberikan respons AUTHORIZED jika proses validasi gagal.
-
-ENVIRONMENT:
-
-GITHUB_READ_TOKEN=
-GITHUB_OWNER=
-GITHUB_REPO=
-GITHUB_BRANCH=main
-GITHUB_DATABASE_PATH=database.json
-ED25519_PRIVATE_KEY=
-
-PUBLIC KEY harus dibuat menggunakan mekanisme key generation yang sesuai dan diberikan kepada pemilik package untuk konfigurasi.
-
-PROJECT STRUCTURE:
-
-ChikaLock-API/
-│
-├── api/
-│   └── scriptlock/
-│       └── [nomor].js
-├── src/
-│   ├── github.js
-│   ├── license.js
-│   └── signature.js
-├── package.json
-├── vercel.json
-└── README.md
-
-==================================================
-
-PROJECT 4: CHIKALOCK NPM PACKAGE + PROTECTOR
-
-==================================================
-
-DIRECTORY:
-
-/workspace/abc/ChikaMD/ProjectBaru/ChikaLock-Package/
-
-PACKAGE NAME:
-
-ChikaLock
-
-PLATFORM:
-
-- Node.js.
-- CommonJS.
-- NPM.
-- JavaScript.
-
-CONFIG.JS:
-
-module.exports = {
-NOMOR_BOT: "628123456789"
-};
-
-PACKAGE FUNCTION:
-
-1. Membaca NOMOR_BOT dari config.js.
-2. Menghubungi Vercel License API.
-3. Mengirim nomor melalui endpoint.
-4. Memverifikasi Ed25519 signed response.
-5. Memeriksa status lisensi.
-6. Menjalankan kode utama jika AUTHORIZED.
-7. Menghentikan eksekusi secara normal jika BLOCKED.
-8. Menghentikan eksekusi secara normal jika NOT_REGISTERED.
-9. Fail closed jika server error.
-10. Fail closed jika signature invalid.
-11. Memeriksa expiry response.
-12. Menangani timeout dan koneksi.
-13. Tidak menghapus file pengguna.
-14. Tidak menggunakan infinite loop.
-15. Tidak menggunakan perilaku destruktif.
-
-PROTECTOR SYSTEM:
-
-Buat build-time protector yang menghasilkan:
-
-dist/ChikaLock.js
-
-PROTECTION FEATURES:
-
-- Minification.
-- Identifier renaming.
-- String transformation.
-- Unicode escaping.
-- Numeric representation.
-- Control-flow transformation yang kompatibel.
-- Integrity checking.
-- Source map tidak disertakan dalam distribusi.
-- Build reproducible.
-- Testing setelah build.
-
-ENCODING:
-
-Mixed Encoding.
-
-MODULE:
-
-CommonJS.
-
-FAILURE:
-
-Process Exit.
-
-SECURITY:
-
-- Jangan memasukkan GitHub token.
-- Jangan memasukkan Ed25519 private key.
-- Jangan menganggap obfuscation sebagai enkripsi.
-- Jangan mengklaim kode mustahil direverse engineer.
-- Jangan merusak kompatibilitas Node.js.
-- Jangan menghalangi pengguna melakukan debugging terhadap aplikasi mereka sendiri secara tidak wajar.
-
-NPM PACKAGE:
-
-- Siapkan package.json.
-- Tentukan main dan exports.
-- Tentukan files yang dipublikasikan.
-- Tambahkan README.
-- Tambahkan build script.
-- Tambahkan test script.
-- Pastikan package dapat diinstal melalui npm.
-- Jangan mempublikasikan .env atau secret.
-
-PROJECT STRUCTURE:
-
-ChikaLock-Package/
-│
-├── index.js
-├── config.js
-├── package.json
-├── README.md
-├── src/
-│   ├── license.js
-│   ├── verifier.js
-│   └── protector.js
-└── dist/
-└── ChikaLock.js
-
-==================================================
-
-INTEGRATION SYSTEM
-
-==================================================
-
-KEEMPAT PROJECT HARUS TERHUBUNG SEBAGAI BERIKUT:
-
-OWNER
-|
-v
-TELEGRAM OWNER BOT
-|
-| GitHub Contents API
-v
-GITHUB DATABASE JSON
-|
-| Read-only access
-v
-VERCEL LICENSE API
-|
-| Signed JSON response
-v
-NPM CHIKALOCK PACKAGE
-|
-v
-LICENSE VALIDATION
-|
-+---- AUTHORIZED
-|        |
-|        v
-|    RUN MAIN CODE
-|
-+---- BLOCKED
-|        |
-|        v
-|    EXIT PROCESS
-|
-+---- NOT_REGISTERED
-|        |
-|        v
-|    EXIT PROCESS
-|
-+---- ERROR
-|
-v
-FAIL CLOSED
-
-==================================================
-
-DEVELOPMENT ORDER
-
-==================================================
-
-KERJAKAN SECARA BERURUTAN:
-
-PHASE 1:
-Bangun ChikaLock-Bot.
-Selesaikan seluruh command dan integrasi GitHub.
-
-PHASE 2:
-Siapkan ChikaLock-Database.
-Pastikan struktur JSON sesuai dengan Bot dan API.
-
-PHASE 3:
-Bangun ChikaLock-API.
-Uji semua status lisensi dan signature.
-
-PHASE 4:
-Bangun ChikaLock-Package.
-Implementasikan license verifier dan protector.
-
-PHASE 5:
-INTEGRATION TESTING.
-
-Uji skenario:
-
-1. Nomor terdaftar dan aktif.
-2. Nomor diblokir.
-3. Nomor tidak terdaftar.
-4. Database tidak tersedia.
-5. Signature tidak valid.
-6. Response expired.
-7. GitHub API conflict.
-8. Nomor tidak valid.
-9. API timeout.
-
-==================================================
-
-FINAL REQUIREMENTS
-
-==================================================
-
-1. Semua project wajib berada di ROOT DIRECTORY yang ditentukan.
-2. Tetap 4 project terpisah.
-3. Jangan menggabungkan keempat project.
-4. Jangan membuat file tambahan yang tidak berguna.
-5. Jangan mengubah file di luar ProjectBaru.
-6. Semua JavaScript wajib CommonJS.
-7. Tidak boleh ada .mjs.
-8. Jangan meninggalkan fitur inti dalam bentuk TODO.
-9. Semua konfigurasi harus jelas.
-10. Sertakan README masing-masing project.
-11. Sertakan cara instalasi dan menjalankan.
-12. Sertakan cara deployment Vercel.
-13. Sertakan cara publish NPM.
-14. Sertakan cara menghubungkan GitHub.
-15. Lakukan testing dan laporkan hasil sebenarnya.
-
-MULAI SEKARANG.
-
-Jangan berhenti setelah membuat direktori atau package.json. Implementasikan keempat project sampai selesai dan lakukan integration testing.
-
-Jika membutuhkan token, private key, atau kredensial eksternal, buat dokumentasi konfigurasi dan tunggu input pemilik. Jangan pernah mengarang kredensial.
+CHIKAMD FULLCOMBINED - CONTINUATION & COMPLETE INTEGRATION
+
+Lanjutkan pengembangan project ChikaMD-FullCombined yang sudah tersedia di workspace saat ini.
+
+TUJUAN UTAMA
+
+Lakukan audit dan integrasi ulang terhadap 3 project sumber:
+
+1. Hoshino AI
+2. vanXone V4
+3. Kaguya Multi Device V5
+   Hasil sebelumnya bernama ChikaMD-FullCombined, tetapi integrasinya belum lengkap. Jangan menganggap project tersebut sudah selesai hanya karena file berhasil digabungkan.
+   TARGET: Menghasilkan satu project ChikaMD yang mengintegrasikan fitur penting dari ketiga project sumber tanpa kehilangan fungsi, konflik kode, atau duplikasi yang tidak diperlukan.
+
+1. AUDIT PROJECT
+
+Periksa seluruh direktori dan file project yang tersedia.
+Identifikasi:
+
+- Struktur folder masing-masing project.
+- Seluruh plugin dan fitur.
+- Core engine.
+- WhatsApp connection dan multi-device.
+- Database dan sistem penyimpanan.
+- Handler dan command system.
+- Downloader dan scraper.
+- Sistem RPG.
+- Sistem AI.
+- Sistem Telegram.
+- Utilities dan helper.
+- Dependencies dan package.
+- File konfigurasi.
+- Modul yang belum terintegrasi.
+  Buat laporan audit internal sebelum melakukan perubahan.
+  Jangan hanya mencocokkan nama file. Periksa isi kode, fungsi, dependensi, dan keterkaitan antarmodul.
+
+2. INTEGRASI HOSHINO AI
+
+Pertahankan seluruh fitur penting Hoshino AI, termasuk:
+
+- Core WhatsApp.
+- Plugin system.
+- Handler.
+- Menu.
+- Database.
+- Utilities.
+- Downloader.
+- AI.
+- Sistem command.
+- Seluruh fitur yang masih relevan.
+  Periksa file besar seperti WAProto dan traineddata. Jangan menghapusnya secara sembarangan.
+
+3. INTEGRASI VANXONE V4
+
+Audit seluruh fitur vanXone V4.
+Identifikasi modul yang belum masuk ke ChikaMD-FullCombined.
+Integrasikan fitur yang belum tersedia, terutama:
+
+- Core engine.
+- Plugin.
+- Utilities.
+- Downloader.
+- Scraper.
+- Sistem command.
+- Modul pendukung.
+  Jangan menimpa implementasi Hoshino yang sudah berfungsi tanpa analisis kompatibilitas.
+
+4. INTEGRASI KAGUYA MULTI DEVICE V5
+
+Prioritaskan bagian ini karena hasil audit sebelumnya menunjukkan integrasinya sangat minim.
+Periksa dan integrasikan modul penting:
+
+- lib/engine/plugins.js
+- lib/rpg/bridge.js
+- lib/services/scraper.js
+- lib/platform/wa.js
+- lib/platform/telegram.js
+- lib/engine/features.js
+- plugins/rich/spotifylive.js
+  Periksa juga seluruh direktori lainnya. Daftar di atas bukan batasan.
+  Pastikan fitur Kaguya yang relevan benar-benar masuk dan dapat digunakan.
+
+5. ARSITEKTUR FINAL
+
+Hasil akhir harus tetap menjadi SATU PROJECT bernama ChikaMD.
+Ketentuan:
+
+- Gunakan satu sistem startup.
+- Gunakan satu sistem konfigurasi utama.
+- Gunakan satu package.json utama.
+- Gunakan satu sistem plugin yang terintegrasi.
+- Gunakan satu sistem database utama jika memungkinkan.
+- Hindari duplikasi engine.
+- Hindari fungsi dengan nama sama tetapi perilaku berbeda tanpa penyelesaian konflik.
+- Gunakan CommonJS secara konsisten.
+- Jangan membuat file .mjs atau sistem ESM.
+- Jangan membuat project tambahan yang berdiri sendiri.
+  Jika modul memiliki arsitektur berbeda, buat adapter atau compatibility layer agar bisa digunakan tanpa merusak implementasi asli.
+
+6. KOMPATIBILITAS
+
+Pastikan:
+
+- Modul lama tetap dapat dipanggil.
+- Plugin lama tidak rusak.
+- Import dan export sesuai.
+- Path file benar.
+- Event listener tidak terdaftar berulang.
+- Tidak ada konflik nama command.
+- Tidak ada circular dependency yang menyebabkan kegagalan.
+- Sistem WhatsApp multi-device tetap berfungsi.
+- Modul Telegram tidak mengganggu WhatsApp.
+- Dependencies tidak saling bertabrakan.
+  Jangan mengubah seluruh kode secara massal hanya demi menyamakan gaya penulisan.
+
+7. OPTIMASI
+
+Optimalkan:
+
+- Ukuran project.
+- Penggunaan RAM.
+- Waktu startup.
+- Penggunaan CPU.
+- Pemanggilan modul.
+- Pengelolaan cache.
+- Penanganan error.
+  Jangan menghapus aset besar, model, database, atau file protokol hanya untuk mengecilkan ukuran project.
+  Jika suatu aset tidak digunakan, buktikan terlebih dahulu melalui pemeriksaan dependensi.
+
+8. STRUKTUR DAN KEBERSIHAN
+
+Pertahankan struktur yang rapi dan konsisten.
+Jangan membuat:
+
+- README tambahan yang tidak diminta.
+- File MYRANZ.
+- File konfigurasi duplikat.
+- File testing yang tidak diperlukan.
+- Folder project bersarang.
+- File .mjs.
+- File hasil eksperimen.
+- Modul kosong.
+  Semua source code harus berada dalam satu project ChikaMD.
+
+9. TESTING WAJIB
+
+Setelah integrasi:
+
+1. Periksa seluruh import dan require.
+2. Periksa seluruh syntax JavaScript.
+3. Periksa dependencies.
+4. Jalankan pemeriksaan startup.
+5. Uji registrasi plugin.
+6. Uji command handler.
+7. Uji database.
+8. Uji kompatibilitas WhatsApp.
+9. Uji modul Telegram.
+10. Uji seluruh adapter.
+11. Periksa error dan warning.
+    Perbaiki error yang ditemukan sebelum menyatakan selesai.
+    Jangan mengklaim fitur berhasil jika hanya berhasil disalin.
+    Untuk fitur yang membutuhkan kredensial atau koneksi eksternal, buat pengujian mock atau dokumentasikan bahwa pengujian live belum dilakukan.
+
+10. LAPORAN AKHIR
+
+Setelah pekerjaan selesai, berikan laporan:
+
+- Jumlah file awal masing-masing project.
+- Jumlah file yang berhasil diintegrasikan.
+- Jumlah file yang diubah.
+- Jumlah modul yang ditambahkan.
+- Jumlah fitur yang berhasil dipertahankan.
+- Modul yang sengaja tidak diintegrasikan beserta alasannya.
+- Dependencies yang ditambahkan atau dihapus.
+- Hasil testing.
+- Error yang masih tersisa.
+- Perkiraan ukuran project akhir.
+  Jangan memanipulasi angka integrasi. Gunakan hasil audit aktual.
+
+ATURAN PENGERJAAN
+
+- Jangan berhenti setelah membuat rencana.
+- Jangan hanya membuat struktur folder.
+- Langsung kerjakan integrasi source code.
+- Jangan meminta konfirmasi untuk setiap perubahan teknis yang aman dan dapat dibatalkan.
+- Jangan menghapus source project asli.
+- Jangan menghapus fitur yang belum dipahami.
+- Jangan membuat implementasi palsu atau placeholder untuk mengklaim fitur selesai.
+- Jika terjadi konflik, analisis dan buat solusi kompatibilitas.
+- Kerjakan secara bertahap dan periksa hasil setiap tahap.
+- Jika context window hampir habis, simpan progres dalam catatan kerja di dalam project dan lanjutkan dari progres tersebut.
+
+KRITERIA SELESAI
+
+ChikaMD hanya boleh dinyatakan selesai apabila:
+
+1. Ketiga project sudah diaudit.
+2. Seluruh fitur relevan sudah diintegrasikan.
+3. Tidak ada kehilangan fitur penting yang tidak dijelaskan.
+4. Seluruh modul utama kompatibel.
+5. Syntax dan import valid.
+6. Testing berhasil sesuai kemampuan lingkungan.
+7. Hasil akhir tetap satu project ChikaMD.
+   MULAI DENGAN AUDIT PROJECT YANG SUDAH ADA, KEMUDIAN LANJUTKAN LANGSUNG KE IMPLEMENTASI SAMPAI SELESAI.
